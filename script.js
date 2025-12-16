@@ -4,6 +4,17 @@ const container = document.getElementById('stationsContainer');
 function init() {
     addStationField();
     addStationField();
+
+    const inputs = document.querySelectorAll('input, select');
+    inputs.forEach(input => {
+        if (input.type === 'checkbox' || input.tagName === 'SELECT') {
+            input.addEventListener('change', generateLink);
+        } else {
+            input.addEventListener('input', generateLink);
+        }
+    });
+
+    generateLink();
 }
 
 function toggleAdvancedOptions() {
@@ -111,6 +122,8 @@ function handleInput(e, type = 'main') {
     if (checkRowsCount < minRows) {
         addFieldFn();
     }
+
+    generateLink();
 }
 
 function generateLink() {
@@ -122,6 +135,8 @@ function generateLink() {
     const errorDiv = document.getElementById('errorMsg');
     const resultContainer = document.getElementById('resultContainer');
     const output = document.getElementById('outputResult');
+    const outputDecoded = document.getElementById('outputResultDecoded');
+    const resultContainerDecoded = document.getElementById('resultContainerDecoded');
     const transportModeCheckboxes = document.querySelectorAll('input[name="transportMode"]:checked');
     const walkSpeed = document.getElementById('walkSpeedSelect').value;
     const directConnection = document.getElementById('directConnectionCheckbox').checked;
@@ -171,6 +186,7 @@ function generateLink() {
     // 5. Validation
     errorDiv.classList.add('hidden');
     resultContainer.classList.add('hidden');
+    resultContainerDecoded.classList.add('hidden'); // Hide decoded container initially
 
     if (validCount === 0) {
         showError("Please enter at least one station.");
@@ -180,64 +196,80 @@ function generateLink() {
     // 6. Construct Query
     const stopsJson = JSON.stringify(stops);
     
-    // URL Encode the JSON, but REVERT the %s escaping
-    let encodedStops = encodeURIComponent(stopsJson).replace(/%25s/g, '%s');
+    // Construct base URL
+    let baseUrl = `https://www.sbb.ch/${lang}?stops=${encodeURIComponent(stopsJson).replace(/%25s/g, '%s')}`;
 
-    let url = `https://www.sbb.ch/${lang}?stops=${encodedStops}`;
+    let decodedUrl = `https://www.sbb.ch/${lang}?stops=${stopsJson}`;
+
 
     if (transportModes.length > 0) {
-        url += `&transportModes=${transportModes.join(',')}`;
+        baseUrl += `&transportModes=${transportModes.join(',')}`;
+        decodedUrl += `&transportModes=${transportModes.join(',')}`;
     }
 
     if (walkSpeed) {
-        url += `&walkSpeed=${walkSpeed}`;
+        baseUrl += `&walkSpeed=${walkSpeed}`;
+        decodedUrl += `&walkSpeed=${walkSpeed}`;
     }
 
     if (directConnection) {
-        url += `&directConnection=true`;
+        baseUrl += `&directConnection=true`;
+        decodedUrl += `&directConnection=true`;
     }
 
     if (economicConnection) {
-        url += `&includeEconomic=true`;
+        baseUrl += `&includeEconomic=true`;
+        decodedUrl += `&includeEconomic=true`;
     }
 
     if (unsharpConnection) {
-        url += `&includeUnsharp=true`;
+        baseUrl += `&includeUnsharp=true`;
+        decodedUrl += `&includeUnsharp=true`;
     }
 
     if (showAccessibility) {
-        url += `&showAccessibility=true`;
+        baseUrl += `&showAccessibility=true`;
+        decodedUrl += `&showAccessibility=true`;
     }
 
     if (hidePrices) {
-        url += `&hidePrices=true`;
+        baseUrl += `&hidePrices=true`;
+        decodedUrl += `&hidePrices=true`;
     }
 
     if (accessibilityFilters.length > 0) {
-        url += `&filterAccessibility=${accessibilityFilters.join(',')}`;
+        baseUrl += `&filterAccessibility=${accessibilityFilters.join(',')}`;
+        decodedUrl += `&filterAccessibility=${accessibilityFilters.join(',')}`;
     }
 
     if (occupancy) {
-        url += `&occupancy=${occupancy}`;
+        baseUrl += `&occupancy=${occupancy}`;
+        decodedUrl += `&occupancy=${occupancy}`;
     }
 
     if (attributes.length > 0) {
-        url += `&attributes=${attributes.join(',')}`;
+        baseUrl += `&attributes=${attributes.join(',')}`;
+        decodedUrl += `&attributes=${attributes.join(',')}`;
     }
 
     if (date) {
-        url += `&date="${date}"`;
+        baseUrl += `&date="${date}"`;
+        decodedUrl += `&date="${date}"`;
     }
     
     if (time) {
-        url += `&time="${time}"`;
+        baseUrl += `&time="${time}"`;
+        decodedUrl += `&time="${time}"`;
     }
 
-    url += `&moment="${moment}"`;
+    baseUrl += `&moment="${moment}"`;
+    decodedUrl += `&moment="${moment}"`;
 
     // 7. Output
-    output.value = url;
+    output.value = baseUrl;
+    outputDecoded.value = decodedUrl;
     resultContainer.classList.remove('hidden');
+    resultContainerDecoded.classList.remove('hidden');
 }
 
 function showError(msg) {
@@ -246,13 +278,13 @@ function showError(msg) {
     el.classList.remove('hidden');
 }
 
-function copyToClipboard() {
-    const copyText = document.getElementById("outputResult");
+function copyToClipboard(elementId) {
+    const copyText = document.getElementById(elementId);
     copyText.select();
     copyText.setSelectionRange(0, 99999); 
     document.execCommand("copy");
     
-    const btn = document.querySelector('button[onclick="copyToClipboard()"]');
+    const btn = document.querySelector(`button[onclick="copyToClipboard('${elementId}')"]`);
     const originalText = btn.innerText;
     btn.innerText = "Copied!";
     setTimeout(() => btn.innerText = originalText, 2000);
