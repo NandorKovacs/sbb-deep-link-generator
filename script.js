@@ -6,6 +6,19 @@ function init() {
     addStationField();
 }
 
+function toggleAdvancedOptions() {
+    const advancedOptions = document.getElementById('advancedOptions');
+    const chevron = document.getElementById('advancedOptionsChevron');
+    
+    if (advancedOptions.classList.contains('hidden')) {
+        advancedOptions.classList.remove('hidden');
+        chevron.classList.add('rotate-90');
+    } else {
+        advancedOptions.classList.add('hidden');
+        chevron.classList.remove('rotate-90');
+    }
+}
+
 // Create a new input field row
 function addStationField() {
     const wrapper = document.createElement('div');
@@ -16,15 +29,18 @@ function addStationField() {
     input.placeholder = "Enter station name (e.g., Zurich HB or %s)";
     input.className = "station-input flex-1 bg-white border border-slate-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500 transition-colors placeholder-slate-400";
     
-    // Event listener for dynamic addition/removal
-    input.addEventListener('input', handleInput);
+    input.addEventListener('input', (e) => handleInput(e, 'main'));
 
     wrapper.appendChild(input);
     container.appendChild(wrapper);
 }
 
-function handleInput(e) {
-    const rows = Array.from(container.querySelectorAll('.station-row'));
+function handleInput(e, type = 'main') {
+    const currentContainer = container;
+    const addFieldFn = addStationField;
+    const minRows = 2;
+
+    const rows = Array.from(currentContainer.querySelectorAll('.station-row'));
     const filledRows = [];
     const emptyRows = [];
     let focusedRow = null;
@@ -54,11 +70,11 @@ function handleInput(e) {
         emptyRowsToKeep.push(emptyRows[emptyRows.length - 1]);
     }
 
-    // 3. Constraint: We need at least 2 rows total
+    // 3. Constraint: We need at least minRows rows total
     let currentTotal = filledRows.length + emptyRowsToKeep.length;
     
-    if (currentTotal < 2) {
-        const needed = 2 - currentTotal;
+    if (currentTotal < minRows) {
+        const needed = minRows - currentTotal;
         const availableToSalvage = emptyRows.filter(r => !emptyRowsToKeep.includes(r));
         
         for (let i = 0; i < needed; i++) {
@@ -76,23 +92,24 @@ function handleInput(e) {
     });
 
     // 5. Check if we need to add a new row
-    const finalRows = Array.from(container.querySelectorAll('.station-row'));
+    const finalRows = Array.from(currentContainer.querySelectorAll('.station-row'));
     
     if (finalRows.length > 0) {
         const lastRow = finalRows[finalRows.length - 1];
         const lastInput = lastRow.querySelector('input');
         if (lastInput.value.trim() !== "") {
-            addStationField();
+            addFieldFn();
         }
     } else {
-        addStationField();
-        addStationField();
+        for(let i = 0; i < minRows; i++) {
+            addFieldFn();
+        }
     }
     
     // 6. Final safety check for min-2 constraint
-    const checkRowsCount = container.querySelectorAll('.station-row').length;
-    if (checkRowsCount < 2) {
-        addStationField();
+    const checkRowsCount = currentContainer.querySelectorAll('.station-row').length;
+    if (checkRowsCount < minRows) {
+        addFieldFn();
     }
 }
 
@@ -105,6 +122,16 @@ function generateLink() {
     const errorDiv = document.getElementById('errorMsg');
     const resultContainer = document.getElementById('resultContainer');
     const output = document.getElementById('outputResult');
+    const transportModeCheckboxes = document.querySelectorAll('input[name="transportMode"]:checked');
+    const walkSpeed = document.getElementById('walkSpeedSelect').value;
+    const directConnection = document.getElementById('directConnectionCheckbox').checked;
+    const economicConnection = document.getElementById('economicConnectionCheckbox').checked;
+    const unsharpConnection = document.getElementById('unsharpConnectionCheckbox').checked;
+    const showAccessibility = document.getElementById('showAccessibilityCheckbox').checked;
+    const hidePrices = document.getElementById('hidePricesCheckbox').checked;
+    const accessibilityCheckboxes = document.querySelectorAll('input[name="filterAccessibility"]:checked');
+    const occupancy = document.getElementById('occupancySelect').value;
+    const attributeCheckboxes = document.querySelectorAll('input[name="attribute"]:checked');
 
     // 1. Collect Valid Stops
     let stops = [];
@@ -123,7 +150,25 @@ function generateLink() {
         }
     });
 
-    // 2. Validation
+    // 2. Collect Transport Modes
+    let transportModes = [];
+    transportModeCheckboxes.forEach(checkbox => {
+        transportModes.push(checkbox.value);
+    });
+
+    // 3. Collect Accessibility Filters
+    let accessibilityFilters = [];
+    accessibilityCheckboxes.forEach(checkbox => {
+        accessibilityFilters.push(checkbox.value);
+    });
+
+    // 4. Collect Attributes
+    let attributes = [];
+    attributeCheckboxes.forEach(checkbox => {
+        attributes.push(checkbox.value);
+    });
+
+    // 5. Validation
     errorDiv.classList.add('hidden');
     resultContainer.classList.add('hidden');
 
@@ -132,13 +177,53 @@ function generateLink() {
         return;
     }
 
-    // 3. Construct Query
+    // 6. Construct Query
     const stopsJson = JSON.stringify(stops);
     
     // URL Encode the JSON, but REVERT the %s escaping
     let encodedStops = encodeURIComponent(stopsJson).replace(/%25s/g, '%s');
 
     let url = `https://www.sbb.ch/${lang}?stops=${encodedStops}`;
+
+    if (transportModes.length > 0) {
+        url += `&transportModes=${transportModes.join(',')}`;
+    }
+
+    if (walkSpeed) {
+        url += `&walkSpeed=${walkSpeed}`;
+    }
+
+    if (directConnection) {
+        url += `&directConnection=true`;
+    }
+
+    if (economicConnection) {
+        url += `&includeEconomic=true`;
+    }
+
+    if (unsharpConnection) {
+        url += `&includeUnsharp=true`;
+    }
+
+    if (showAccessibility) {
+        url += `&showAccessibility=true`;
+    }
+
+    if (hidePrices) {
+        url += `&hidePrices=true`;
+    }
+
+    if (accessibilityFilters.length > 0) {
+        url += `&filterAccessibility=${accessibilityFilters.join(',')}`;
+    }
+
+    if (occupancy) {
+        url += `&occupancy=${occupancy}`;
+    }
+
+    if (attributes.length > 0) {
+        url += `&attributes=${attributes.join(',')}`;
+    }
 
     if (date) {
         url += `&date="${date}"`;
@@ -150,7 +235,7 @@ function generateLink() {
 
     url += `&moment="${moment}"`;
 
-    // 4. Output
+    // 7. Output
     output.value = url;
     resultContainer.classList.remove('hidden');
 }

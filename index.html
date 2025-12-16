@@ -9,7 +9,8 @@
 </head>
 <body class="bg-slate-100 min-h-screen py-10 px-4 font-sans text-slate-800">
 
-    <div class="max-w-2xl mx-auto bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden">
+    <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-lg       │
+│    border border-slate-200 overflow-hidden"> 
         
         <div class="bg-red-600 p-6 text-white">
             <h1 class="text-2xl font-bold">SBB Deep Link Generator</h1>
@@ -40,7 +41,7 @@
 
                 <div>
                     <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Language [Required]</label>
-                    <select id="langSelect" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500 transition-colors">
+                    <select id="langSelect" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-500 transition-colors">
                         <option value="en">EN (English)</option>
                         <option value="de" selected>DE (German)</option>
                         <option value="fr">FR (French)</option>
@@ -56,8 +57,183 @@
                 </label>
                 
                 <div id="stationsContainer" class="space-y-3">
-                    </div>
+                </div>
             </div>
+
+            <div id="advancedOptionsContainer" class="space-y-4">
+                <button onclick="toggleAdvancedOptions()" class="w-full text-left text-sm font-semibold text-slate-600 hover:text-slate-800 transition-colors flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 transition-transform" id="advancedOptionsChevron" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                    </svg>
+                    Advanced Options
+                </button>
+
+                <div id="advancedOptions" class="hidden space-y-4 pt-2">
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
+                            Transport Modes
+                        </label>
+                        <div id="transportModesContainer" class="grid grid-cols-2 md:grid-cols-3 gap-2">
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" name="transportMode" value="HIGH_SPEED_TRAIN" class="form-checkbox">
+                                <span>High-Speed Train</span>
+                            </label>
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" name="transportMode" value="INTERCITY" class="form-checkbox">
+                                <span>Intercity</span>
+                            </label>
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" name="transportMode" value="INTERREGIO" class="form-checkbox">
+                                <span>Interregio</span>
+                            </label>
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" name="transportMode" value="REGIO" class="form-checkbox">
+                                <span>Regio</span>
+                            </label>
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" name="transportMode" value="URBAN_TRAIN" class="form-checkbox">
+                                <span>Urban Train</span>
+                            </label>
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" name="transportMode" value="SPECIAL_TRAIN" class="form-checkbox">
+                                <span>Special Train</span>
+                            </label>
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" name="transportMode" value="TRAMWAY" class="form-checkbox">
+                                <span>Tram</span>
+                            </label>
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" name="transportMode" value="BUS" class="form-checkbox">
+                                <span>Bus</span>
+                            </label>
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" name="transportMode" value="SHIP" class="form-checkbox">
+                                <span>Ship</span>
+                            </label>
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" name="transportMode" value="CABLEWAY_GONDOLA_CHAIRLIFT_FUNICULAR" class="form-checkbox">
+                                <span>Cableway/Gondola</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="walkSpeedSelect" class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Walk Speed</label>
+                            <select id="walkSpeedSelect" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500 transition-colors">
+                                <option value="">Default</option>
+                                <option value="SLOW">Slow</option>
+                                <option value="NORMAL">Normal</option>
+                                <option value="FAST">Fast</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
+                            UI Options
+                        </label>
+                        <div id="uiOptionsContainer" class="grid grid-cols-2 md:grid-cols-3 gap-2">
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" id="showAccessibilityCheckbox" class="form-checkbox">
+                                <span>Show Accessibility</span>
+                            </label>
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" id="hidePricesCheckbox" class="form-checkbox">
+                                <span>Hide Prices</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
+                            Connections
+                        </label>
+                        <div id="connectionsContainer" class="grid grid-cols-2 md:grid-cols-3 gap-2">
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" id="directConnectionCheckbox" class="form-checkbox">
+                                <span>Direct</span>
+                            </label>
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" id="economicConnectionCheckbox" class="form-checkbox">
+                                <span>Economic</span>
+                            </label>
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" id="unsharpConnectionCheckbox" class="form-checkbox">
+                                <span>Unsharp</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
+                            Filter Accessibility
+                        </label>
+                        <div id="filterAccessibilityContainer" class="grid grid-cols-2 md:grid-cols-3 gap-2">
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" name="filterAccessibility" value="ASSISTED_BOARDING" class="form-checkbox">
+                                <span>Assisted Boarding</span>
+                            </label>
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" name="filterAccessibility" value="STEP_FREE_ACCESS" class="form-checkbox">
+                                <span>Step-Free Access</span>
+                            </label>
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" name="filterAccessibility" value="NO_STAIRS" class="form-checkbox">
+                                <span>No Stairs</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="occupancySelect" class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Occupancy</label>
+                        <select id="occupancySelect" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500 transition-colors">
+                            <option value="">Any</option>
+                            <option value="SECOND_LOW">Low Occupancy Second Class</option>
+                            <option value="FIRST_LOW">Low Occupancy First Class</option>
+                        </select>                    
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
+                            Attributes
+                        </label>
+                        <!-- <p class="text-xs text-slate-500 mb-2">Filter by train services and features (e.g., RE for Regional Express, BZ for Business Zone, FA for Family Zone, BC for Bicycle Transport).</p> -->
+                        <div id="attributesContainer" class="grid grid-cols-2 md:grid-cols-4 gap-2">
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" name="attribute" value="RE" class="form-checkbox">
+                                <span>Regional Express</span>
+                            </label>
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" name="attribute" value="BZ" class="form-checkbox">
+                                <span>Business Zone</span>
+                            </label>
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" name="attribute" value="FA" class="form-checkbox">
+                                <span>Family Zone</span>
+                            </label>
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" name="attribute" value="BIKE_TRANSPORT" class="form-checkbox">
+                                <span>Bike Transport</span>
+                            </label>
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" name="attribute" value="SLEEPING_CAR" class="form-checkbox">
+                                <span>Sleeping Car</span>
+                            </label>
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" name="attribute" value="COUCHETTE" class="form-checkbox">
+                                <span>Couchette</span>
+                            </label>
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" name="attribute" value="EXCLUDE_TILTING_TRAIN" class="form-checkbox">
+                                <span>No Tilting Train</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
 
             <button onclick="generateLink()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 px-4 rounded-lg shadow-md transition-all active:scale-[0.98] flex justify-center items-center gap-2">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
