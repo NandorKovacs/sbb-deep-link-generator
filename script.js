@@ -5,14 +5,22 @@ function init() {
     addStationField();
     addStationField();
 
-    const inputs = document.querySelectorAll('input, select');
+    const inputs = document.querySelectorAll('input[type="text"], input[type="date"], input[type="time"]');
     inputs.forEach(input => {
-        if (input.type === 'checkbox' || input.tagName === 'SELECT') {
-            input.addEventListener('change', generateLink);
-        } else {
-            input.addEventListener('input', generateLink);
-        }
+        input.addEventListener('input', generateLink);
     });
+
+    const checkboxesAndSelects = document.querySelectorAll('input[type="checkbox"], select');
+    checkboxesAndSelects.forEach(input => {
+        input.addEventListener('change', generateLink);
+    });
+
+    const infoButton = document.getElementById('infoButton');
+    const infoPopup = document.getElementById('infoPopup');
+    const closePopup = document.getElementById('closePopup');
+
+    infoButton.addEventListener('click', togglePopup);
+    closePopup.addEventListener('click', togglePopup);
 
     generateLink();
 }

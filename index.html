@@ -9,12 +9,28 @@
 </head>
 <body class="bg-slate-100 min-h-screen py-10 px-4 font-sans text-slate-800">
 
-    <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-lg       │
-│    border border-slate-200 overflow-hidden"> 
+    <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden relative">
         
-        <div class="bg-red-600 p-6 text-white">
-            <h1 class="text-2xl font-bold">SBB Deep Link Generator</h1>
-            <p class="text-red-100 mt-1 text-sm">Create dynamic timetable URLs with preserved placeholders (%s).</p>
+        <div class="bg-red-600 p-6 text-white flex justify-between items-center">
+            <div>
+                <h1 class="text-2xl font-bold">SBB Deep Link Generator</h1>
+                <p class="text-red-100 mt-1 text-sm">Create dynamic timetable URLs with preserved placeholders (%s) for site-search.</p>
+            </div>
+            <button id="infoButton" class="text-white">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+            </button>
+        </div>
+
+        <div id="infoPopup" class="hidden absolute top-0 left-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center">
+            <div class="bg-white p-8 rounded-lg shadow-lg max-w-md w-full">
+                <h2 class="text-xl font-bold mb-4">About this Tool</h2>
+                <p class="mb-4">This tool generates SBB deeplinks. You can create URLs for use in site-search applications or for sharing pre-filled timetable searches.</p>
+                <p class="mb-4">Any field left empty will be omitted from the generated url, and the SBB default will be assumed</p>
+                <p class="mb-4">It implements the official url parameters published by SBB. For more information, please refer to the <a href="https://company.sbb.ch/content/dam/internet/corporate/downloads/en/sbb-als-geschaeftspartner/dienstleistungen/fahrplanintegration/Deep_Linking_SBB_Fahrplan.pdf.sbbdownload.pdf" target="_blank" class="text-red-600 hover:underline">SBB Deep Linking documentation</a>.</p>
+                <button id="closePopup" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-2 px-4 rounded-lg">Close</button>
+            </div>
         </div>
 
         <div class="p-6 space-y-6">
@@ -32,7 +48,7 @@
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Direction [Required]</label>
+                    <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Departure - Arrival [Required]</label>
                     <select id="momentSelect" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500 transition-colors">
                         <option value="DEPARTURE">Departure</option>
                         <option value="ARRIVAL">Arrival</option>
@@ -123,9 +139,8 @@
                             <label for="walkSpeedSelect" class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Walk Speed</label>
                             <select id="walkSpeedSelect" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500 transition-colors">
                                 <option value="">Default</option>
-                                <option value="SLOW">Slow</option>
-                                <option value="NORMAL">Normal</option>
-                                <option value="FAST">Fast</option>
+                                <option value="walkSpeed=150">Slow (1.5x)</option>
+                                <option value="walkSpeed=200">Very Slow (2x)</option>
                             </select>
                         </div>
                     </div>
@@ -172,16 +187,16 @@
                         </label>
                         <div id="filterAccessibilityContainer" class="grid grid-cols-2 md:grid-cols-3 gap-2">
                             <label class="flex items-center space-x-2">
-                                <input type="checkbox" name="filterAccessibility" value="ASSISTED_BOARDING" class="form-checkbox">
-                                <span>Assisted Boarding</span>
+                                <input type="checkbox" name="filterAccessibility" value="BOARDING_ALIGHTING_SELF" class="form-checkbox">
+                                <span>Independent boarding</span>
                             </label>
                             <label class="flex items-center space-x-2">
-                                <input type="checkbox" name="filterAccessibility" value="STEP_FREE_ACCESS" class="form-checkbox">
-                                <span>Step-Free Access</span>
+                                <input type="checkbox" name="filterAccessibility" value="BOARDING_ALIGHTING_BY_CREW" class="form-checkbox">
+                                <span>Staff assisted boarding</span>
                             </label>
                             <label class="flex items-center space-x-2">
-                                <input type="checkbox" name="filterAccessibility" value="NO_STAIRS" class="form-checkbox">
-                                <span>No Stairs</span>
+                                <input type="checkbox" name="filterAccessibility" value="BOARDING_ALIGHTING_BY_NOTIFICATION" class="form-checkbox">
+                                <span>Boarding with booking in advance</span>
                             </label>
                         </div>
                     </div>
@@ -201,18 +216,6 @@
                         </label>
                         <!-- <p class="text-xs text-slate-500 mb-2">Filter by train services and features (e.g., RE for Regional Express, BZ for Business Zone, FA for Family Zone, BC for Bicycle Transport).</p> -->
                         <div id="attributesContainer" class="grid grid-cols-2 md:grid-cols-4 gap-2">
-                            <label class="flex items-center space-x-2">
-                                <input type="checkbox" name="attribute" value="RE" class="form-checkbox">
-                                <span>Regional Express</span>
-                            </label>
-                            <label class="flex items-center space-x-2">
-                                <input type="checkbox" name="attribute" value="BZ" class="form-checkbox">
-                                <span>Business Zone</span>
-                            </label>
-                            <label class="flex items-center space-x-2">
-                                <input type="checkbox" name="attribute" value="FA" class="form-checkbox">
-                                <span>Family Zone</span>
-                            </label>
                             <label class="flex items-center space-x-2">
                                 <input type="checkbox" name="attribute" value="BIKE_TRANSPORT" class="form-checkbox">
                                 <span>Bike Transport</span>
@@ -234,22 +237,21 @@
                 </div>
             </div>
 
-
-            <div id="resultContainer" class="hidden">
-                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Generated URL (Encoded)</label>
+            <div id="resultContainerDecoded" class="hidden mt-4">
+                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Generated URL</label>
                 <div class="relative">
-                    <textarea id="outputResult" readonly class="w-full h-32 bg-slate-800 text-green-400 font-mono text-xs p-4 rounded-lg border border-slate-700 resize-none focus:outline-none"></textarea>
-                    <button onclick="copyToClipboard('outputResult')" class="absolute top-2 right-2 bg-white/10 hover:bg-white/20 text-white text-xs px-2 py-1 rounded transition-colors">
+                    <textarea id="outputResultDecoded" readonly class="w-full h-32 bg-slate-800 text-green-400 font-mono text-xs p-4 rounded-lg border border-slate-700 resize-none focus:outline-none"></textarea>
+                    <button onclick="copyToClipboard('outputResultDecoded')" class="absolute top-2 right-2 bg-white/10 hover:bg-white/20 text-white text-xs px-2 py-1 rounded transition-colors">
                         Copy
                     </button>
                 </div>
             </div>
 
-            <div id="resultContainerDecoded" class="hidden mt-4">
-                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Generated URL (Decoded)</label>
+            <div id="resultContainer" class="hidden">
+                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Generated URL (Urlencoded)</label>
                 <div class="relative">
-                    <textarea id="outputResultDecoded" readonly class="w-full h-32 bg-slate-800 text-green-400 font-mono text-xs p-4 rounded-lg border border-slate-700 resize-none focus:outline-none"></textarea>
-                    <button onclick="copyToClipboard('outputResultDecoded')" class="absolute top-2 right-2 bg-white/10 hover:bg-white/20 text-white text-xs px-2 py-1 rounded transition-colors">
+                    <textarea id="outputResult" readonly class="w-full h-32 bg-slate-800 text-green-400 font-mono text-xs p-4 rounded-lg border border-slate-700 resize-none focus:outline-none"></textarea>
+                    <button onclick="copyToClipboard('outputResult')" class="absolute top-2 right-2 bg-white/10 hover:bg-white/20 text-white text-xs px-2 py-1 rounded transition-colors">
                         Copy
                     </button>
                 </div>
