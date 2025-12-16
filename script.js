@@ -25,6 +25,11 @@ function init() {
     generateLink();
 }
 
+function togglePopup() {
+    const infoPopup = document.getElementById('infoPopup');
+    infoPopup.classList.toggle('hidden');
+}
+
 function toggleAdvancedOptions() {
     const advancedOptions = document.getElementById('advancedOptions');
     const chevron = document.getElementById('advancedOptionsChevron');
